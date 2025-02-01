@@ -1,21 +1,29 @@
 package com.gymmembership.system.impl;
 
-import com.app.dao.UserDAO;
-import com.app.model.User;
+import com.gymmembership.system.dao.UserDAO;
+import com.gymmembership.system.model.User;
 import com.gymmembership.system.util.DbConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class UserDaoImpl extends DbConnection implements UserDAO {
+public class UserDaoImpl implements UserDAO {
 
+     private DbConnection dbConnection;
+
+    // Constructor injection of DbConnection
+    public UserDaoImpl() {
+        dbConnection = new DbConnection(); 
+    }
+
+    // Get a connection using dbConnect() from DbConnection
     private Connection getConnection() {
-        return dbConnect();
+        return dbConnection.dbConnect();
     }
 
     @Override
     public boolean registerUser(User user) {
-        String sql = "INSERT INTO users (username, password, role, lastname, firstname, middlename, gender, address, contact, registrationDate, expirationDate, status, packageId, archived) "
+        String sql = "INSERT INTO tblusers (user_username, user_password, user_role, user_lastname, user_firstname, user_middlename, user_gender, user_address, user_contact, user_registration_date, user_expiration_date, user_status, user_package_id, user_archived) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = getConnection(); 
@@ -48,30 +56,14 @@ public class UserDaoImpl extends DbConnection implements UserDAO {
 
     @Override
     public User getUser(int id) {
-        String sql = "SELECT * FROM users WHERE id = ?";
+        String sql = "SELECT * FROM tblusers WHERE user_id = ?";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new User(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("role"),
-                        rs.getString("lastname"),
-                        rs.getString("firstname"),
-                        rs.getString("middlename"),
-                        rs.getString("gender"),
-                        rs.getString("address"),
-                        rs.getString("contact"),
-                        rs.getDate("registrationDate"),
-                        rs.getDate("expirationDate"),
-                        rs.getString("status"),
-                        rs.getInt("packageId"),
-                        rs.getInt("archived")
-                );
+                return mapResultSetToUser(rs);
             }
         } catch (SQLException e) {
             System.out.println("Failed to retrieve user!");
@@ -83,29 +75,13 @@ public class UserDaoImpl extends DbConnection implements UserDAO {
     @Override
     public ArrayList<User> fetchMembers() {
         ArrayList<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM users";
+        String sql = "SELECT * FROM tblusers";
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
             while (rs.next()) {
-                users.add(new User(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("role"),
-                        rs.getString("lastname"),
-                        rs.getString("firstname"),
-                        rs.getString("middlename"),
-                        rs.getString("gender"),
-                        rs.getString("address"),
-                        rs.getString("contact"),
-                        rs.getDate("registrationDate"),
-                        rs.getDate("expirationDate"),
-                        rs.getString("status"),
-                        rs.getInt("packageId"),
-                        rs.getInt("archived")
-                ));
+                users.add(mapResultSetToUser(rs));
             }
         } catch (SQLException e) {
             System.out.println("Failed to fetch users!");
@@ -117,7 +93,7 @@ public class UserDaoImpl extends DbConnection implements UserDAO {
     @Override
     public ArrayList<User> searchUsers(String criteria) {
         ArrayList<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM users WHERE username LIKE ? OR lastname LIKE ? OR firstname LIKE ?";
+        String sql = "SELECT * FROM tblusers WHERE user_username LIKE ? OR user_lastname LIKE ? OR user_firstname LIKE ?";
         
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -128,23 +104,7 @@ public class UserDaoImpl extends DbConnection implements UserDAO {
             
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                users.add(new User(
-                        rs.getInt("id"),
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("role"),
-                        rs.getString("lastname"),
-                        rs.getString("firstname"),
-                        rs.getString("middlename"),
-                        rs.getString("gender"),
-                        rs.getString("address"),
-                        rs.getString("contact"),
-                        rs.getDate("registrationDate"),
-                        rs.getDate("expirationDate"),
-                        rs.getString("status"),
-                        rs.getInt("packageId"),
-                        rs.getInt("archived")
-                ));
+                users.add(mapResultSetToUser(rs));
             }
         } catch (SQLException e) {
             System.out.println("Failed to search users!");
@@ -155,7 +115,7 @@ public class UserDaoImpl extends DbConnection implements UserDAO {
 
     @Override
     public boolean updateUser(User newUser, User oldUser) {
-        String sql = "UPDATE users SET username = ?, password = ?, role = ?, lastname = ?, firstname = ?, middlename = ?, gender = ?, address = ?, contact = ?, registrationDate = ?, expirationDate = ?, status = ?, packageId = ?, archived = ? WHERE id = ?";
+        String sql = "UPDATE tblusers SET user_username = ?, user_password = ?, user_role = ?, user_lastname = ?, user_firstname = ?, user_middlename = ?, user_gender = ?, user_address = ?, user_contact = ?, user_registration_date = ?, user_expiration_date = ?, user_status = ?, user_package_id = ?, user_archived = ? WHERE user_id = ?";
         
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -187,7 +147,7 @@ public class UserDaoImpl extends DbConnection implements UserDAO {
 
     @Override
     public void archiveOrRestoreUser(User user) {
-        String sql = "UPDATE users SET archived = ? WHERE id = ?";
+        String sql = "UPDATE tblusers SET user_archived = ? WHERE user_id = ?";
         
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -203,7 +163,7 @@ public class UserDaoImpl extends DbConnection implements UserDAO {
 
     @Override
     public void deleteUser(User user) {
-        String sql = "DELETE FROM users WHERE id = ?";
+        String sql = "DELETE FROM tblusers WHERE user_id = ?";
         
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -218,7 +178,7 @@ public class UserDaoImpl extends DbConnection implements UserDAO {
 
     @Override
     public String loginUser(String username, String password) {
-        String sql = "SELECT role FROM users WHERE username = ? AND password = ?";
+        String sql = "SELECT role FROM tblusers WHERE user_username = ? AND user_password = ?";
         
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -235,5 +195,25 @@ public class UserDaoImpl extends DbConnection implements UserDAO {
             e.printStackTrace();
         }
         return null;
+    }
+    
+    private User mapResultSetToUser(ResultSet rs) throws SQLException {
+        return new User(
+            rs.getInt("user_id"),
+            rs.getString("user_username"),
+            rs.getString("user_password"),
+            rs.getString("user_role"),
+            rs.getString("user_lastname"),
+            rs.getString("user_firstname"),
+            rs.getString("user_middlename"),
+            rs.getString("user_gender"),
+            rs.getString("user_address"),
+            rs.getString("user_contact"),
+            rs.getDate("user_registration_date"),
+            rs.getDate("user_expiration_date"),
+            rs.getString("user_status"),
+            rs.getInt("user_package_id"),
+            rs.getInt("user_archived")
+        );
     }
 }

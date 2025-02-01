@@ -4,7 +4,7 @@
  */
 package com.gymmembership.system.dao;
 
-import com.app.model.User;
+import com.gymmembership.system.model.User;
 import java.util.ArrayList;
 
 /**

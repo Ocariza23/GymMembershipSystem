@@ -1,7 +1,7 @@
 package com.gymmembership.system.util;
 import java.sql.*;
 
-public abstract class DbConnection {
+public class DbConnection {
 
     private final String URL = "jdbc:mysql://localhost:3306/dbgymbro";
     private final String USERNAME = "root";

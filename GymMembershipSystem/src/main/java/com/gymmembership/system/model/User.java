@@ -3,6 +3,7 @@ package com.gymmembership.system.model;
 import java.sql.Date;
 
 public class User {
+
    private int id; 
    private String username; 
    private String password;
@@ -192,4 +193,9 @@ public class User {
     public void setArchived(int archived) {
         this.archived = archived;
     }  
+    
+    @Override
+    public String toString() {
+        return "User{" + "id=" + id + ", username=" + username + ", password=" + password + ", role=" + role + ", lastname=" + lastname + ", firstname=" + firstname + ", middlename=" + middlename + ", gender=" + gender + ", address=" + address + ", contact=" + contact + ", registrationDate=" + registrationDate + ", expirationDate=" + expirationDate + ", status=" + status + ", packageId=" + packageId + ", archived=" + archived + '}';
+    }
 }

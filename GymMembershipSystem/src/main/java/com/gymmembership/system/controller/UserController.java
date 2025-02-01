@@ -1,11 +1,18 @@
-package com.app.controller;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.gymmembership.system.controller;
 
 import com.app.dao.UserDAO;
 import com.app.model.User;
 import com.app.view.UserView;
 import java.util.ArrayList;
 
-
+/**
+ *
+ * @author MJ
+ */
 public class UserController {
     private UserDAO userDAO; 
     private UserView userView; 
@@ -138,17 +145,16 @@ public class UserController {
         
         if(!role.equals("")){
             switch(role){
-                case "admin":
+                case "admin": 
                     // Go to Admin Dashboard
                     System.out.println("Admin!");
                     break;
-                
                 case "member":
                     // Go to Member Dashboard
                     System.out.println("Member!");
-                break;
-                
-                default:System.out.println("Something went wrong!");
+                    break;
+                default:
+                    System.out.println("Something went wrong!");
             }
                         
         }
@@ -157,5 +163,5 @@ public class UserController {
             loginUser();
         }
     }
-    
+
 }

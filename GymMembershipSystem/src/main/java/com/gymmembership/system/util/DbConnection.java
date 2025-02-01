@@ -24,29 +24,22 @@ public abstract class DbConnection {
         }
 
     }
-        
-        
+               
     //MJ's setup
     String serverName = "localhost\\SQLEXPRESS";
     String dbName = "dbgymbro";
     String username = "mj";
     String password = "Password";
 
-    public void dbConnect(){
-         // JDBC connection string for SQL Server
+    public Connection dbConnect(){
+        
         String urlConnection = "jdbc:sqlserver://" + serverName + ":1433;databaseName=" + dbName + ";encrypt=false;trustServerCertificate=true";
 
         try {
-            // Load SQL Server JDBC Driver
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
-            // Establish the connection
-            Connection conn = DriverManager.getConnection(urlConnection, username, password);
+            return DriverManager.getConnection(urlConnection, username, password);
 
-            System.out.println("Connected to the database successfully!");
-
-            // Close the connection
-            conn.close();
         } catch (ClassNotFoundException e) {
             System.out.println("JDBC Driver not found!");
             e.printStackTrace();
@@ -54,5 +47,6 @@ public abstract class DbConnection {
             System.out.println("Database connection failed!");
             e.printStackTrace();
         }
+        return null;
     }
 }
